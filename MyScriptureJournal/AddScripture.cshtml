@@ -1,0 +1,51 @@
+﻿@{
+    var book = "";
+    var chapter = 0;
+    var verse = 0;
+    var note = "";
+
+    if (IsPost)
+    {
+        book = Request.Form["book"];
+        chapter = Convert.ToInt32(Request.Form["chapter"]);
+        verse = Convert.ToInt32(Request.Form["verse"]);
+        note = Request.Form["note"];
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Add a Scripture</title>
+</head>
+<body>
+    <h1>Add a Scripture</h1>
+    <form method="post">
+        <fieldset>
+            <legend>Scripture Information</legend>
+            <p>
+                <label for="book">Book:</label>
+                <input type="text" name="book" value="@Request.Form["book"]" />
+            </p>
+
+            <p>
+                <label for="chapter">Chapter:</label>
+                <input type="number" name="chapter" value="@Request.Form["chapter"]" />
+            </p>
+
+            <p>
+                <label for="verse">Verse:</label>
+                <input type="number" name="verse" value="@Request.Form["verse"]" />
+            </p>
+
+            <p>
+                <label for="note">Note:</label>
+                <input type="text" name="note" value="@Request.Form["note"]" />
+            </p>
+
+            <p><input type="submit" name="buttonSubmit" value="Add Scripture" /></p>
+        </fieldset>
+    </form>
+</body>
+</html>
