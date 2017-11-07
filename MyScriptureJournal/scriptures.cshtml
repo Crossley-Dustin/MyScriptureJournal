@@ -1,22 +1,40 @@
 ﻿@{ 
+    Layout = "~/_Layout.cshtml";
+
+    Page.Title = "List Scriptures";
+
     var db = Database.Open("ScriptureJournal");
-    var selectedData = db.Query("SELECT * FROM JournalEntries");
-    var grid = new WebGrid(source: selectedData, rowsPerPage: 5);
+    var selectCommand = "SELECT * FROM JournalEntries";
+    var searchTerm = "";
+
+    if(!Request.QueryString["searchBook"].IsEmpty() )
+    {
+        selectCommand = "SELECT * FROM JournalEntries WHERE Book = @0";
+        searchTerm = Request.QueryString["searchBook"];
+    }
+
+    if(!Request.QueryString["searchNote"].IsEmpty())
+    {
+        selectCommand = "SELECT * FROM JournalEntries WHERE Note LIKE @0";
+        searchTerm = "%" + Request["searchNote"] + "%";
+    }
+
+    var selectedData = db.Query(selectCommand, searchTerm);
+    var grid = new WebGrid(source: selectedData, defaultSort: "Book", rowsPerPage: 5);
 }
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <title>My Scripture Journal</title>
-</head>
-<body>
-    <h1>Scriptures</h1>
+
+    <h2>Scriptures</h2>
     <form method="get">
         <div>
             <label for="searchBook">Book to look for:</label>
-            <input type="text" name="searchBook" value="" />
+            <input type="text" name="searchBook" value="@Request.QueryString["searchBook"]" />
             <input type="Submit" value="Search Book" /><br />
             (Leave blank to list all scriptures.)<br />
+        </div>
+        <div>
+            <label for="SearchNote">Journal note contains the following:</label>
+            <input type="text" name="SearchNote" value="@Request.QueryString["searchNote"]" />
+            <input type="Submit" value="Search Note" /><br />
         </div>
     </form>
     <div>
@@ -25,13 +43,17 @@
             headerStyle: "head",
             alternatingRowStyle: "alt",
             columns: grid.Columns(
+            grid.Column(format: @<a href="~/EditScripture?id=@item.ID">Edit</a>),
             grid.Column("Book"),
             grid.Column("Chapter"),
             grid.Column("Verse"),
             grid.Column("Note"),
-            grid.Column("DateAdded")
+            grid.Column("DateSubmitted"),
+            grid.Column(format: @<a href="~/DeleteScripture?id=@item.ID">Delete</a>)
         )
     )
     </div>
-</body>
-</html>
+    <p>
+        <a href="~/AddScripture">Add a scripture</a>
+    </p>
+
